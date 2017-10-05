@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import GoogleMap from './Map';
+import Address from './Address';
+// import fetch from 'node-fetch';
 
 class App extends Component {
   constructor(props) {
@@ -8,41 +9,54 @@ class App extends Component {
     this.state = {
       address1: '',
       address2: '',
+      lat: 30.2672,
+      lng: -97.7431,
+      startLocation: {
+        lat: 0,
+        lng: 0
+      },
+      endLocation: {
+        lat: 0,
+        lng: 0
+      }
+
     }
-    this.initMap = this.initMap.bind(this);
   }
-  // componentDidMount() {
-  //  var map;
-  //  map = new google.maps.Map(this.refs.map, {
-  //     center: {lat: -34.397, lng: 150.644},
-  //     zoom: 8
-  //   });
-  //  return map;
-  // }
-  initMap() { 
-    var map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: -34.397, lng: 150.644},
-      zoom: 8
-    });
-    return map;
+  handleAddressChange1(newAddress) {
+    this.setState({
+      address1: newAddress
+    })
+  }
+  handleAddressChange2(newAddress) {
+     this.setState({
+      address2: newAddress
+    })
+  }
+  updateStartLocation(location) {
+    this.setState({
+      startLocation: {
+        lat: location.lat,
+        lng: location.lng
+      }
+    })
+
+  }
+  updateEndLocation(location) {
+    this.setState({
+      endLocation: {
+        lat: location.lat,
+        lng: location.lng
+      }
+    })
   }
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-        <div id="map"></div>
-          <script>
-            {this.initMap}   
-          </script>
-                  
-            
-       </div>
+      <div className="App">      
+        <Address address={this.state.address1} updateLocation={this.updateStartLocation.bind(this)} handleChange={this.handleAddressChange1.bind(this)} />
+        <Address address={this.state.address2} updateLocation={this.updateEndLocation.bind(this)} handleChange={this.handleAddressChange2.bind(this)} />
+        <button type="button" onClick={() => this.handleClick()}>Search</button>
+        <GoogleMap lat={this.state.lat} lng={this.state.lng}  startPosition={this.state.startLocation} endPosition={this.state.endLocation} />           
+      </div>
         
     );
   }

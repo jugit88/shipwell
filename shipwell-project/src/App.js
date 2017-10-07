@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import GoogleMap from './Map';
 import Address from './Address';
 // import fetch from 'node-fetch';
-
+const google = window.google
 class App extends Component {
   constructor(props) {
     super(props);
@@ -19,8 +19,16 @@ class App extends Component {
         lat: 0,
         lng: 0
       },
-      markers: []
-
+      markers: [],
+      marker1: new google.maps.Marker({}),
+      marker2: new google.maps.Marker({}),
+      route:  directionsService.route({
+        travelMode: 'DRIVING'
+        }, function(response, status) {
+        if (status === 'OK') {
+          directionsDisplay.setDirections(response);
+        }  
+      })
     }
   }
   handleAddressChange1(newAddress) {
@@ -60,10 +68,29 @@ class App extends Component {
       markers: []
     })
   }
-  replaceMarker(newMarker) {
+  replaceMarker(index, newMarker) {
     this.setState(prevState => ({
-      markers: prevState.markers.splice(0, 1, newMarker)
+      markers: prevState.markers.splice(index, 1, newMarker)
     }));
+  }
+  updateMarker1(map, newPosition) {
+    let tempMarker = this.state.marker1;
+    tempMarker.setPosition(newPosition);
+    tempMarker.setMap(map);
+    this.setState({
+      marker1: tempMarker
+    });
+  }
+  updateMarker2(map, newPosition) {
+    let tempMarker = this.state.marker2;
+    tempMarker.setPosition(newPosition);
+    tempMarker.setMap(map);
+    this.setState({
+      marker2: tempMarker
+    });
+  }
+  updateRoute(origin, destination) {
+
   }
   render() {
     return (
@@ -71,9 +98,9 @@ class App extends Component {
         <Address address={this.state.address1} updateLocation={this.updateStartLocation.bind(this)} handleChange={this.handleAddressChange1.bind(this)} />
         <Address address={this.state.address2} updateLocation={this.updateEndLocation.bind(this)} handleChange={this.handleAddressChange2.bind(this)} />
         <button type="button" onClick={() => this.handleClick()}>Search</button>
-        <GoogleMap lat={this.state.lat} lng={this.state.lng}  
-          startPosition={this.state.startLocation} endPosition={this.state.endLocation} 
-          markers={this.state.markers} replaceMarker={this.replaceMarker.bind(this)} removeMarkers={this.removeMarkers.bind(this)} addMarker={this.addMarker.bind(this)}
+        <GoogleMap lat={this.state.lat} lng={this.state.lng} start={this.state.marker1} end={this.state.marker2} updateStart={this.updateMarker1.bind(this)}
+          startPosition={this.state.startLocation} endPosition={this.state.endLocation} updateEnd={this.updateMarker2.bind(this)} 
+      
         />           
       </div>
         

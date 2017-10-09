@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 // import Marker from './Marker'
 const google = window.google;
-
+// const directionsService = new google.maps.DirectionsService;
+// const directionsDisplay = new google.maps.DirectionsRenderer;
 class GoogleMap extends Component {
   componentDidMount() {
     // initialize map
@@ -22,29 +23,31 @@ class GoogleMap extends Component {
     if (location.lat !== newLocation.lat || location.lng !== newLocation.lng) {
       // check which marker needs to be updated
       markerLabel === 'start' ? 
-        this.props.updateStart(this.map,newLocation): this.props.updateEnd(this.map,newLocation)
-   
+        this.props.updateStart(this.map,newLocation): this.props.updateEnd(this.map,newLocation) 
     }
   }
-  calculateAndDisplayRoute(directionsService, directionsDisplay) {
-    if (this.props.start.getPosition() === undefined) 
-      return;
+  calculateAndDisplayRoute(directionsService, directionsDisplay, newStart, newEnd) {
+    // compare new and old props to see if markers have updated. If not, do not update route
+    
+    // does a marker exist at a specific location? If not, return.
+    if (!this.props.start.getPosition() || !this.props.end.getPosition()) 
+      return; 
     directionsService.route({
-      origin: { lat: this.props.start.getPosition().lat(), lng: this.props.start.getPosition().lng() },
-      destination: { lat: this.props.end.getPosition().lat(), lng: this.props.end.getPosition().lng() },
-      travelMode: 'DRIVING'
-    }, function(response, status) {
-      if (status === 'OK') {
-        directionsDisplay.setDirections(response);
-      }  
-      
-    });
+        origin: this.props.startPosition,
+        destination: this.props.endPosition,
+        travelMode: 'DRIVING'
+        }, function(response, status) {
+        if (status === 'OK') {
+          directionsDisplay.setDirections(response);
+        }  
+    })
+
+
   }
   drawRoute() {
-    var directionsService = new google.maps.DirectionsService;
-    var directionsDisplay = new google.maps.DirectionsRenderer;
-    directionsDisplay.setMap(this.map);
-    this.calculateAndDisplayRoute(directionsService, directionsDisplay);
+    // create new direction service/render instances and inject new props of new markers into calculateandDisplay route
+    this.props.directionsDisplay.setMap(this.map);
+    this.calculateAndDisplayRoute(this.props.directionsService, this.props.directionsDisplay);
     
 
   }

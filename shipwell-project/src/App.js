@@ -22,13 +22,8 @@ class App extends Component {
       markers: [],
       marker1: new google.maps.Marker({}),
       marker2: new google.maps.Marker({}),
-      route:  directionsService.route({
-        travelMode: 'DRIVING'
-        }, function(response, status) {
-        if (status === 'OK') {
-          directionsDisplay.setDirections(response);
-        }  
-      })
+      directionsService: new google.maps.DirectionsService,
+      directionsDisplay: new google.maps.DirectionsRenderer
     }
   }
   handleAddressChange1(newAddress) {
@@ -89,9 +84,8 @@ class App extends Component {
       marker2: tempMarker
     });
   }
-  updateRoute(origin, destination) {
-
-  }
+  
+  
   render() {
     return (
       <div className="App">      
@@ -100,6 +94,7 @@ class App extends Component {
         <button type="button" onClick={() => this.handleClick()}>Search</button>
         <GoogleMap lat={this.state.lat} lng={this.state.lng} start={this.state.marker1} end={this.state.marker2} updateStart={this.updateMarker1.bind(this)}
           startPosition={this.state.startLocation} endPosition={this.state.endLocation} updateEnd={this.updateMarker2.bind(this)} 
+          directionsService={this.state.directionsService} directionsDisplay={this.state.directionsDisplay}
       
         />           
       </div>

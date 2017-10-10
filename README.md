@@ -7,7 +7,7 @@
 - automatic recalculation of routes
 
 ### Start
-1. clone repo
+1. clone repo and `cd` into the repo
 2. `cd shipwell-project`
 3. `yarn install` or `npm install`
 4. `yarn start` or `npm start`

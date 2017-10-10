@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
-// import Marker from './Marker'
+
 const google = window.google;
-// const directionsService = new google.maps.DirectionsService;
-// const directionsDisplay = new google.maps.DirectionsRenderer;
+
 class GoogleMap extends Component {
+  // render map after component mounts in order to have access to DOM element with id/ref "map"
   componentDidMount() {
-    // initialize map
+    // initialize map at Austin, TX :)
     this.map = new google.maps.Map(this.mapInstance,{
-       center: {lat: this.props.lat, lng: this.props.lng},
-       zoom: 5
+       center: this.props.initLocation,
+       zoom: 8
      });
   }
  
   // create/update markers and route before mounted component's props change
   componentWillReceiveProps(nextProps) {
+    // update start marker
     this.updateMarker(this.props.startPosition, nextProps.startPosition, 'start');
+    // update end marker
     this.updateMarker(this.props.endPosition, nextProps.endPosition, 'end');
+    // draw/update route
     this.drawRoute();
   }
   updateMarker(location, newLocation, markerLabel) {
@@ -26,21 +29,27 @@ class GoogleMap extends Component {
         this.props.updateStart(this.map,newLocation): this.props.updateEnd(this.map,newLocation) 
     }
   }
-  calculateAndDisplayRoute(directionsService, directionsDisplay, newStart, newEnd) {
-    // compare new and old props to see if markers have updated. If not, do not update route
-    
-    // does a marker exist at a specific location? If not, return.
-    if (!this.props.start.getPosition() || !this.props.end.getPosition()) 
-      return; 
-    directionsService.route({
-        origin: this.props.startPosition,
-        destination: this.props.endPosition,
+  calculateAndDisplayRoute(directionsService, directionsDisplay) {    
+    // does a marker(s) exist at a specific location? If no markers, return. If one marker exists, pan to that location.
+    if (!this.props.start.getPosition() && !this.props.end.getPosition()) 
+      return;
+    if (!this.props.start.getPosition())
+      this.map.panTo(this.props.endPosition);
+    if (!this.props.end.getPosition())
+      this.map.panTo(this.props.startPosition);
+    // both markers exist, draw the route between the two.
+    else {
+      directionsService.route({
+        origin: {lat: this.props.start.getPosition().lat(), lng: this.props.start.getPosition().lng()},
+        destination: {lat: this.props.end.getPosition().lat(), lng: this.props.end.getPosition().lng()},
         travelMode: 'DRIVING'
         }, function(response, status) {
         if (status === 'OK') {
           directionsDisplay.setDirections(response);
         }  
-    })
+      })  
+    }
+    
 
 
   }
@@ -52,12 +61,12 @@ class GoogleMap extends Component {
 
   }
   
-  
+  // to access dom elements use the ref attribute to integrate w/Google maps api
   render() {
     return (
       <div id="map-container">
         <div ref={(map => {this.mapInstance = map})} 
-         style={{height: '500px', width: '500px'}}>
+         style={{height: '550px', width: '100%'}}>
        </div>
      </div>
     );
